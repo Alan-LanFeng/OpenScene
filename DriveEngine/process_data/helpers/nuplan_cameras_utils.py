@@ -77,13 +77,13 @@ def get_cam_info_from_lidar_pc(log, lidar_pc, log_cam_infos):
         log_file, [lidar_pc.token], [str(channel.value) for channel in CameraChannel]
     )
     cams = {}
+    camera_exists = True
     for img in retrieved_images:
         channel = img.channel
         filename = img.filename_jpg
-
         filepath = os.path.join(NUPLAN_SENSOR_PATH, filename)
         if not os.path.exists(filepath):
-            return None
+            camera_exists = False
         cam_info = log_cam_infos[img.camera_token]
         cams[channel] = dict(
             data_path = filename,
@@ -93,5 +93,5 @@ def get_cam_info_from_lidar_pc(log, lidar_pc, log_cam_infos):
             distortion = cam_info['distortion'],
         )
     if len(cams) != 8:
-        return None
-    return cams
+        camera_exists = False
+    return cams, camera_exists
